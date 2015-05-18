@@ -1,0 +1,8 @@
+version:	
+	@echo 'Generating version.h'
+	@echo ' '
+	@echo "#ifndef _VERSION_H" > ../src/version.h
+	@echo "#define _VERSION_H" >> ../src/version.h
+	@echo "#define VERSION_NUM $(VERSION) " >> ../src/version.h
+	@echo "#define BUILD_DATE \"`date`\" " >> ../src/version.h
+	@echo "#endif " >> ../src/version.h

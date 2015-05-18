@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/BINARY_NAME/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/BINARY_NAME/operation=replace
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/BINARY_NAME/value=f4_ftp
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/CYGWIN_HOME/delimiter=;
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/CYGWIN_HOME/operation=replace
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/CYGWIN_HOME/value=C\:\\cygwin\\bin
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/VERSION/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/VERSION/operation=append
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/VERSION/value=0x000001
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/append=true
+environment/project/cdt.managedbuild.config.gnu.cross.exe.release.724265813/appendContributed=true
