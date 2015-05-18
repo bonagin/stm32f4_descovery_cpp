@@ -96,6 +96,13 @@ cyg_uint32 stm32cpu::readflash(cyg_uint32 Address)
 	flashunlock();
 
 	cyg_uint32 reg32;
+
+	HAL_READ_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_ACR, reg32);
+
+	reg32 |= CYGHWR_HAL_STM32_FLASH_ACR_LATENCY(5);
+
+	HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_ACR, reg32);
+
 	HAL_READ_UINT32(Address, reg32);
 
 	return reg32;
