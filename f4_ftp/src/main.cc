@@ -12,7 +12,7 @@ extern "C" void cyg_user_start(void);
 
 void cyg_user_start(void)
 {
-	diag_printf("Hello %s\n", __DATE__);
+	diag_printf("Build %s\n", __DATE__);
 
 	cInit::init();
 }

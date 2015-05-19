@@ -72,9 +72,9 @@ void stm32cpu::flashCmd(cTerm & term,int argc,char *argv[])
 	    cyg_uint32 data     = (cyg_uint32)strtoul(argv[2],NULL,16);
 	    cyg_uint32 Address  = (cyg_uint32)strtoul(argv[3],NULL,16);
 
-	    witeflash(data,Address);
+	    diag_printf("Writing : 0x%8X at address 0x%8X \n", data, Address);
 
-		diag_printf("Writing : 0x%8X at address 0x%8X \n", data, Address);
+	    witeflash(data,Address);
 	}
 	else if(!(strcmp(argv[1],"unlock")))
 	{
@@ -88,6 +88,10 @@ void stm32cpu::flashCmd(cTerm & term,int argc,char *argv[])
 	{
 		cyg_uint32 Sector  = (cyg_uint32)strtoul(argv[2],NULL,16);
 		eraseflash(Sector);
+	}
+	else
+	{
+		diag_printf("Not a valid flash command\n");
 	}
 }
 
@@ -149,12 +153,12 @@ void stm32cpu::eraseflash(cyg_uint32 Sector)
 
     HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_CR, reg32);
 
-    flash_status status = getflashstatus();
-
-    while(status == FLASH_BUSY)
-    {
-    	status = getflashstatus();
-    }
+//    flash_status status = getflashstatus();
+//
+//    while(status == FLASH_BUSY)
+//    {
+//    	status = getflashstatus();
+//    }
 
     cyg_thread_delay(100);
 
@@ -175,12 +179,12 @@ void stm32cpu::eraseallsectors()
 
 	    HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_CR, reg32);
 
-	    flash_status status = getflashstatus();
-
-	    while(status == FLASH_BUSY)
-	    {
-	    	status = getflashstatus();
-	    }
+//	    flash_status status = getflashstatus();
+//
+//	    while(status == FLASH_BUSY)
+//	    {
+//	    	status = getflashstatus();
+//	    }
 
 	    cyg_thread_delay(200);
 
@@ -198,17 +202,22 @@ void stm32cpu::flashunlock()
     	diag_printf("flash locked, writing unlock keys\n");
     	HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_KEYR, CYGHWR_HAL_STM32_FLASH_KEYR_KEY1);
     	HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_KEYR, CYGHWR_HAL_STM32_FLASH_KEYR_KEY2);
+
+        HAL_READ_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_CR, reg32);
+        if(reg32 & CYGHWR_HAL_STM32_FLASH_CR_LOCK)
+        {
+        	diag_printf("Failed to unlock the flash\n");
+        }
+        else
+        {
+        	diag_printf("Flash unlocked successfully\n");
+        }
     }
     else
     {
         diag_printf("flash Unlocked\n");
     }
 
-    HAL_READ_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_CR, reg32);
-    if(reg32 & CYGHWR_HAL_STM32_FLASH_CR_LOCK)
-    {
-    	diag_printf("Failed to unlock the flash\n");
-    }
 }
 
 void stm32cpu::lock()

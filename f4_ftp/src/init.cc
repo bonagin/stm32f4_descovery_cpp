@@ -73,7 +73,7 @@ void cInit::init_thread_func(cyg_addrword_t arg)
 	cLED::init(ledPinNumbers, 4);
 
 	// Initialize the Terminals
-//	usbTerm::init(128, "stm32f4_disc>>");
+	usbTerm::init(128, "");
 	uartTerm::init("/dev/tty1",128,"stm32f4_disc>>");
 
 

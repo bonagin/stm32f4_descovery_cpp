@@ -352,12 +352,15 @@ void usbTerm::handleData(cyg_uint8* buff, cyg_uint32 len)
 	for(cyg_uint8 k = 0; k < len; k++)
 	{
 		mCMDbuff[mCMDidx] = buff[k];
-		send(&buff[k], 1);
+		//send(&buff[k], 1);
+		diag_printf("%c", (char)buff[k]);
 
 		if((mCMDbuff[mCMDidx] == '\n') || (mCMDbuff[mCMDidx] == '\r'))
 		{
 			//diag_printf("USB: %d\n", mUSBcmdlen);
 			//diag_dump_buf(mRxBuff, mUSBcmdlen);
+
+			diag_printf("\r\n");
 
 			mCMDbuff[mCMDidx] = 0;
 
@@ -388,7 +391,7 @@ void usbTerm::write(const char * string, cyg_uint32 len)
 
 void usbTerm::banner()
 {
-    *this<<"Terminal started on USB FS as STMicroelectronics Virtual COM port\r\n";
+//    *this<<"Terminal started on USB FS as STMicroelectronics Virtual COM port\r\n";
 }
 
 cyg_uint32 usbTerm::send(cyg_uint8* buff, cyg_uint32 len)

@@ -5,6 +5,7 @@
 #include "input_port.h"
 #include "definitions.h"
 #include "utils.h"
+#include "stm32cpu.h"
 
 cInput* cInput::__instance = NULL;
 
@@ -138,6 +139,20 @@ void cInput::handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data)
 
 	if(__instance)
 		diag_printf("Alarm interrupt %d %s\n",input + 1,__instance->getPortState(input)?"IN":"OUT");
+
+
+
+	cyg_uint8 log[5];
+
+	cyg_uint8 dir;
+	cyg_uint8 day;
+	cyg_uint8 hour;
+
+	if(getPortState(input)){dir = 0x01;}else{dir = 0x00;}
+	log[0] = dir;
+	log[1]
+
+
 
 	cyg_interrupt_unmask(vector);
 }
