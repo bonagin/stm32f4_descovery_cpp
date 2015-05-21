@@ -2,6 +2,7 @@
 #include <TermCMD.h>
 
 #include "stm32cpu.h"
+#include "logger.h"
 
 TermCMD::cmd_table_t TermCMD::mCmdTable [] =
 {
@@ -14,6 +15,7 @@ TermCMD::cmd_table_t TermCMD::mCmdTable [] =
     {"reset"	, "",			"Reset processor", System::reset},
 	{"FLASH"	,0,0,0},
 	{"flash", "<read/write/erase/eraseall> <address> <value>",			"Read/write/erase the flash" , stm32cpu::flashCmd},
+	{"readlogs", "",			"Read all the alarm logs on the flash" , stm32cpu::flashCmd},
 	{"STM32"	,0,0,0},
 	{"pstatus"	, "",			"Reset processor", stm32cpu::pStatus},
 

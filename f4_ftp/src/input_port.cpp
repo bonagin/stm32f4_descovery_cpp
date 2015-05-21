@@ -1,11 +1,13 @@
 #include <cyg/kernel/diag.h>
 #include <cyg/kernel/kapi.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "input_port.h"
 #include "definitions.h"
 #include "utils.h"
 #include "stm32cpu.h"
+#include "logger.h"
 
 cInput* cInput::__instance = NULL;
 
@@ -138,21 +140,40 @@ void cInput::handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data)
 	cyg_uint8 input  = (cyg_uint8)data;
 
 	if(__instance)
-		diag_printf("Alarm interrupt %d %s\n",input + 1,__instance->getPortState(input)?"IN":"OUT");
+		diag_printf("\nDoor %d %s",input + 1,__instance->getPortState(input)?"OPEN":"CLOSED");
 
+	time_t * t;
 
+	struct tm* tStruct = localtime(t);
 
-	cyg_uint8 log[5];
+	time_t now = time(NULL);
+	diag_printf(" ON %s\n",asctime(localtime(&now)));
 
-	cyg_uint8 dir;
-	cyg_uint8 day;
-	cyg_uint8 hour;
+	cyg_uint8 log[4];
 
-	if(getPortState(input)){dir = 0x01;}else{dir = 0x00;}
-	log[0] = dir;
-	log[1]
+	cyg_uint8 dir  =  0X00;
+	cyg_uint8 day  = tStruct->tm_wday;
+	cyg_uint8 hour = tStruct->tm_hour;
+	cyg_uint8 min  = tStruct->tm_min;
 
+	if(__instance->getPortState(input)){dir = 0x01;}else{dir = 0x00;}
+	log[0] = min;
+	log[1] = hour;
+	log[2] = day;
+	log[3] = dir;
 
+	cyg_uint32 log32 = *((cyg_uint32*)log);
+
+//	cyg_uint32 log32 = log[3]<<24 | log[2]<<16 | log[1]<<8 | log[0];
+
+	cLOG::write_log(log32);
+
+    for(int x = 0; x < 4; x++)
+    {
+    	diag_printf("log[%d] = 0x%02X\n",x,log[x]);
+    }
+
+    diag_printf("log  = 0x%08X\n",log32);
 
 	cyg_interrupt_unmask(vector);
 }
