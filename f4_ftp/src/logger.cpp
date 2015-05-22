@@ -14,6 +14,7 @@
 cLOG* cLOG::__instance = NULL;
 
 cyg_uint32 start_address = 0x08040000;
+cyg_uint32 last_address;
 
 void cLOG::init()
 {
@@ -67,20 +68,19 @@ read:
 	else
 	{
 		start_address = start_address + 4;
+		last_address = start_address;
 		goto read;
 	}
 
 }
 
-void cLOG::read_logs()
+void cLOG::read_logs(cyg_uint32 start_address_, cyg_uint32 last_address_)
 {
 
- cyg_uint32 log_address = start_address;
-
 read2:
-    cyg_uint32 log = stm32cpu::readflash(log_address);
+    cyg_uint32 log = stm32cpu::readflash(start_address_);
 
-	if(log_address <= 0x08040000)
+	if(start_address_ == last_address_)
 	{
 		diag_printf("No more logs Available\n");
 	}
@@ -88,50 +88,50 @@ read2:
 	{
 		if(!(log == 0xFFFFFFFF))
 		{
-			if(((cyg_uint8)(log >> 0) & 0xff) == 0x00)
+			if(((cyg_uint8)(log >> 24) & 0xff) == 0x00)
 			{
-				diag_printf("Open on ");
+				diag_printf("\n------->Open on ");
 			}
-			else if(((cyg_uint8)(log >> 0) & 0xff) == 0x01)
+			else if(((cyg_uint8)(log >> 24) & 0xff) == 0x01)
 			{
-				diag_printf("Closes on ");
+				diag_printf("\n------->Closed on ");
 			}
 
-			if(((cyg_uint8)(log >> 8) & 0xff) == 0x00)
+			if(((cyg_uint8)(log >> 16) & 0xff) == 0x00)
 			{
 				diag_printf("Sun at ");
 			}
-			else if(((cyg_uint8)(log >> 8) & 0xff) == 0x01)
+			else if(((cyg_uint8)(log >> 16) & 0xff) == 0x01)
 			{
 				diag_printf("Mon at ");
 			}
-			else if(((cyg_uint8)(log >> 8) & 0xff) == 0x02)
+			else if(((cyg_uint8)(log >> 16) & 0xff) == 0x02)
 			{
 				diag_printf("Tues at ");
 			}
-			else if(((cyg_uint8)(log >> 8) & 0xff) == 0x03)
+			else if(((cyg_uint8)(log >> 16) & 0xff) == 0x03)
 			{
 				diag_printf("Wed at ");
 			}
-			else if(((cyg_uint8)(log >> 8) & 0xff) == 0x04)
+			else if(((cyg_uint8)(log >> 16) & 0xff) == 0x04)
 			{
 				diag_printf("Thurs at ");
 			}
-			else if(((cyg_uint8)(log >> 8) & 0xff) == 0x05)
+			else if(((cyg_uint8)(log >> 16) & 0xff) == 0x05)
 			{
 				diag_printf("Fri at ");
 			}
-			else if(((cyg_uint8)(log >> 8) & 0xff) == 0x06)
+			else if(((cyg_uint8)(log >> 16) & 0xff) == 0x06)
 			{
 				diag_printf("Sat at ");
 			}
 
-			cyg_uint8 hour = (cyg_uint8)(log >> 16) & 0xff;
-			cyg_uint8 min  = (cyg_uint8)(log >> 24) & 0xff;
+			cyg_uint8 hour = (cyg_uint8)(log >> 8) & 0xff;
+			cyg_uint8 min  = (cyg_uint8)(log >> 0) & 0xff;
 
-			diag_printf("%dh%d\n",(int)hour,(int)min);
+			diag_printf("%dh%d<----------\n\n\n",(int)hour,(int)min);
 
-			log_address = log_address - 4;
+			start_address_ = start_address_ + 4;
 			goto read2;
 		}
 	}

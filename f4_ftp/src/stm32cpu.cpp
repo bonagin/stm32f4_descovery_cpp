@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "stm32cpu.h"
+#include "logger.h"
 
 
  void stm32cpu::info()
@@ -88,6 +89,16 @@ void stm32cpu::flashCmd(cTerm & term,int argc,char *argv[])
 	{
 		cyg_uint32 Sector  = (cyg_uint32)strtoul(argv[2],NULL,16);
 		eraseflash(Sector);
+	}
+	else if(!(strcmp(argv[1],"readlogs")))
+	{
+
+	    cyg_uint32 start_address_ = (cyg_uint32)strtoul(argv[2],NULL,16);
+	    cyg_uint32 last_address_  = (cyg_uint32)strtoul(argv[3],NULL,16);
+
+	    diag_printf("Reading logs from : 0x%8X to 0x%8X \n", start_address_, last_address_);
+
+		cLOG::get()->read_logs(start_address_,last_address_);
 	}
 	else
 	{

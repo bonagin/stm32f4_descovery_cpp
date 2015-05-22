@@ -14,11 +14,11 @@ class cLOG
 	cyg_thread mLOGThread;
 	cyg_handle_t mLOGThreadHandle;
 	static void log_thread(cyg_addrword_t args);
-	static void read_logs();
 
 	cLOG();
 
 public:
+	static void read_logs(cyg_uint32 start_address_, cyg_uint32 last_address_);
 	static void init();
 	static cLOG* get();
 	static void write_log(cyg_uint32 log);

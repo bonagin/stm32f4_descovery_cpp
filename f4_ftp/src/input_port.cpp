@@ -166,7 +166,7 @@ void cInput::handleDSR(cyg_vector_t vector,cyg_uint32 count,cyg_addrword_t data)
 
 //	cyg_uint32 log32 = log[3]<<24 | log[2]<<16 | log[1]<<8 | log[0];
 
-	cLOG::write_log(log32);
+	cLOG::get()->write_log(log32);
 
     for(int x = 0; x < 4; x++)
     {
