@@ -77,8 +77,12 @@ read:
 void cLOG::read_logs(cyg_uint32 start_address_, cyg_uint32 last_address_)
 {
 
+	if(start_address_ == 0x00){start_address_ = 0x08040000;}
+	int i = 0;
+
 read2:
     cyg_uint32 log = stm32cpu::readflash(start_address_);
+    i ++;
 
 	if(start_address_ == last_address_)
 	{
@@ -90,11 +94,11 @@ read2:
 		{
 			if(((cyg_uint8)(log >> 24) & 0xff) == 0x00)
 			{
-				diag_printf("\n------->Open on ");
+				diag_printf("log #%d - Open on ",i);
 			}
 			else if(((cyg_uint8)(log >> 24) & 0xff) == 0x01)
 			{
-				diag_printf("\n------->Closed on ");
+				diag_printf("log #%d - Closed on ",i);
 			}
 
 			if(((cyg_uint8)(log >> 16) & 0xff) == 0x00)
@@ -129,10 +133,14 @@ read2:
 			cyg_uint8 hour = (cyg_uint8)(log >> 8) & 0xff;
 			cyg_uint8 min  = (cyg_uint8)(log >> 0) & 0xff;
 
-			diag_printf("%dh%d<----------\n\n\n",(int)hour,(int)min);
+			diag_printf("%dh%d\n",(int)hour,(int)min);
 
 			start_address_ = start_address_ + 4;
 			goto read2;
+		}
+		else
+		{
+			diag_printf("No more logs Available\n");
 		}
 	}
 

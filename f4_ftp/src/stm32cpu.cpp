@@ -210,7 +210,7 @@ void stm32cpu::flashunlock()
 
     if(reg32 & CYGHWR_HAL_STM32_FLASH_CR_LOCK)
     {
-    	diag_printf("flash locked, writing unlock keys\n");
+//    	diag_printf("flash locked, writing unlock keys\n");
     	HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_KEYR, CYGHWR_HAL_STM32_FLASH_KEYR_KEY1);
     	HAL_WRITE_UINT32(CYGHWR_HAL_STM32_FLASH + CYGHWR_HAL_STM32_FLASH_KEYR, CYGHWR_HAL_STM32_FLASH_KEYR_KEY2);
 
@@ -219,14 +219,6 @@ void stm32cpu::flashunlock()
         {
         	diag_printf("Failed to unlock the flash\n");
         }
-        else
-        {
-        	diag_printf("Flash unlocked successfully\n");
-        }
-    }
-    else
-    {
-        diag_printf("flash Unlocked\n");
     }
 
 }
