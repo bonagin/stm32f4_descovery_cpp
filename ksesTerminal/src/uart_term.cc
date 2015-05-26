@@ -96,7 +96,7 @@ void uartTerm::run(void)
     {
     	process_command_line();
     }
-    prompt();
+   prompt();
 }
 
 
