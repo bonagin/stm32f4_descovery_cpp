@@ -7,9 +7,16 @@
 #include <cyg/kernel/diag.h>
 #include <cyg/hal/var_io.h>
 #include <stdio.h>
+#include <time.h>
+
 #include "stm32cpu.h"
 #include "logger.h"
 #include "usb_term.h"
+#include "term.h"
+
+
+
+char usb_data[100];
 
 cLOG* cLOG::__instance = NULL;
 
@@ -56,14 +63,47 @@ void cLOG::log_thread(cyg_addrword_t args)
 	}
 }
 
-void cLOG::write_log(cyg_uint32 log)
+void cLOG::write_log(cyg_uint8 dir_)
 {
+
+	time_t * t;
+
+	struct tm* tStruct = localtime(t);
+
+	time_t now = time(NULL);
+	diag_printf(" ON %s\n",asctime(localtime(&now)));
+
+	cyg_uint8 log[4];
+
+	cyg_uint8 day  = tStruct->tm_wday;
+	cyg_uint8 hour = tStruct->tm_hour;
+	cyg_uint8 min  = tStruct->tm_min;
+
+	log[0] = min;
+	log[1] = hour;
+	log[2] = day;
+	log[3] = dir_;
+
+	cyg_uint32 log32 = *((cyg_uint32*)log);
+
+//	cyg_uint32 log32 = log[3]<<24 | log[2]<<16 | log[1]<<8 | log[0];
+
+    for(int x = 0; x < 4; x++)
+    {
+    	diag_printf("log[%d] = 0x%02X\n",x,log[x]);
+    }
+
+    diag_printf("log  = 0x%08X\n",log32);
+
+    sprintf(usb_data, "DIR:%02X\nDAY:%02X\nHOR:%02X\nMIN:%02X\n", dir_, day, hour, min);
+
+    usbTerm::get()->write(usb_data, 100);
 
 read:
 
 	if(stm32cpu::readflash(start_address) == 0xFFFFFFFF)
 	{
-		stm32cpu::witeflash(log,start_address);
+		stm32cpu::witeflash(log32,start_address);
 	}
 	else
 	{
@@ -77,8 +117,6 @@ read:
 void cLOG::read_logs(cyg_uint32 start_address_, cyg_uint32 last_address_)
 {
 
-	int usb_len = 4;
-	cyg_uint8 usb_data[usb_len];
 	if(start_address_ == 0x00){start_address_ = 0x08040000;}
 	int i = 0;
 
@@ -94,42 +132,44 @@ read2:
 	{
 		if(!(log_ == 0xFFFFFFFF))
 		{
-			if(((cyg_uint8)(log_ >> 24) & 0xff) == 0x00)
+			cyg_uint8 dir = ((cyg_uint8)(log_ >> 24));
+			if((dir & 0xff) == 0x00)
 			{
 				diag_printf("log_ #%d - Open on ",i);
 			}
-			else if(((cyg_uint8)(log_ >> 24) & 0xff) == 0x01)
+			else if((dir & 0xff) == 0x01)
 			{
 				diag_printf("log_ #%d - Closed on ",i);
 			}
 
-			if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x00)
+			cyg_uint8 day = ((cyg_uint8)(log_ >> 16) & 0xff);
+			if((day & 0xff) == 0x00)
 			{
-				diag_printf("Sun at ");
+				diag_printf("Sunday at ");
 			}
-			else if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x01)
+			else if((day & 0xff) == 0x01)
 			{
-				diag_printf("Mon at ");
+				diag_printf("Monday at ");
 			}
-			else if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x02)
+			else if((day & 0xff) == 0x02)
 			{
-				diag_printf("Tues at ");
+				diag_printf("Tuesday at ");
 			}
-			else if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x03)
+			else if((day & 0xff) == 0x03)
 			{
-				diag_printf("Wed at ");
+				diag_printf("Wednesday at ");
 			}
-			else if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x04)
+			else if((day & 0xff) == 0x04)
 			{
-				diag_printf("Thurs at ");
+				diag_printf("Thursday at ");
 			}
-			else if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x05)
+			else if((day & 0xff) == 0x05)
 			{
-				diag_printf("Fri at ");
+				diag_printf("Friday at ");
 			}
-			else if(((cyg_uint8)(log_ >> 16) & 0xff) == 0x06)
+			else if((day & 0xff) == 0x06)
 			{
-				diag_printf("Sat at ");
+				diag_printf("Saturday at ");
 			}
 
 			cyg_uint8 hour = (cyg_uint8)(log_ >> 8) & 0xff;
@@ -137,9 +177,9 @@ read2:
 
 			diag_printf("%dh%d\n",(int)hour,(int)min);
 
-			memcpy(usb_data, (const char *) &(log_),usb_len);
+		    sprintf(usb_data,"LOG:%d\nDIR:%02X\nDAY:%02X\nHOR:%02X\nMIN:%02X\n",i,dir, day, hour, min);
 
-            usbTerm::get()->send(usb_data,usb_len);
+		    usbTerm::get()->write(usb_data, 100);
 
 			start_address_ = start_address_ + 4;
 			goto read2;

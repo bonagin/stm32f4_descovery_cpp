@@ -21,7 +21,7 @@ public:
 	static void read_logs(cyg_uint32 start_address_, cyg_uint32 last_address_);
 	static void init();
 	static cLOG* get();
-	static void write_log(cyg_uint32 log);
+	static void write_log(cyg_uint8 dir);
 };
 
 

@@ -40,10 +40,12 @@ private:
 	static void rx_thread_func(cyg_addrword_t arg);
 	void handleData(cyg_uint8* Buf, cyg_uint32 Len);
 
-	void write(const char * string, cyg_uint32 len);
 	void banner();
 
 public:
+
+	void write(const char * string, cyg_uint32 len);
+
 	static void init(cyg_uint32 b_size, const char * const prompt_str);
 	static usbTerm* get(){ return __instance; };
 
